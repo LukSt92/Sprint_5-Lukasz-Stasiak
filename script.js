@@ -26,16 +26,6 @@ const people = [
   },
 ];
 
-// Treść zadania:
-// Napisz funkcję przetwarzającą tablicę obiektów osób. Funkcja powinna generować pseudonim na podstawie określonych zasad i dodawać go do każdego obiektu osoby, gdy jest to możliwe.
-// Nie nadpisuj danych wejściowych.
-// Wytyczne:
-// Pobierz trzy ostatnie trzy litery imienia, odwróć ich kolejność i zapisz wynik
-// Weź pierwsze trzy litery nazwiska, odwróć ich kolejność i dodaj to do wyniku z poprzedniego punktu
-// Sformatuj połączony wynik tak, aby pseudonim zaczynał się od wielkiej litery, a reszta liter była mała.
-// Dodaj ten pseudonim jako nową właściwość do obiektu osoby.
-// Jeśli firstName lub lastName ma mniej niż trzy znaki (pomiń znaki białe) lub nie jest typu string, nie dodawaj właściwości pseudonimu dla tej osoby.
-
 const nicknameGenerator = () => {
   return people.map((person) => {
     if (
@@ -54,25 +44,8 @@ const nicknameGenerator = () => {
   });
 };
 
-// Stwórz funkcję, która przetworzy tablicę osób z pierwszego zadania (Należy wykorzystać wynik wywołania funkcji z pierwszego zadania),
-//  zwracając tylko osoby, które mają przypisany pseudonim oraz dodając nowe pole age do każdej osoby.
-
-// Wytyczne:
-
-// Filtruj tablicę, aby zawierała tylko osoby z pseudonimem.
-
-// Oblicz liczbę liter w imieniu i nazwisku każdej osoby.
-
-// Jeśli suma liter jest parzysta, przypisz ją jako age. Jeśli nieparzysta, age oblicz jako sumę liter w kluczach firstName ,
-// lastName i nickname pobieranych dynamicznie podzieloną przez indeks osoby w tablicy ( jeżeli index wynosi 0 zastąp go 1 ).
-// Użyj odpowiedniej metody do wyciagnięcia kluczy z obiektu oraz reduce w notacji łańcuchowej do zliczenia liter w kluczach.
-
-// Dodaj pole age do każdego obiektu osoby.
-
-// Zadbaj o to by wiek był zaokrąglony w górę (odszukaj potrzebnej informacji w internecie).
-
-const ageGenerator = (array) => {
-  const peopleWithAge = array.filter((people, index) => {
+const ageGenerator = () => {
+  return nicknameGenerator().filter((people, index) => {
     if (people.nickname) {
       let age = people.firstName.length + people.lastName.length;
       if (age % 2 === 0) people.age = age;
@@ -85,7 +58,34 @@ const ageGenerator = (array) => {
       return people;
     }
   });
-  return peopleWithAge;
 };
 
-console.log(ageGenerator(nicknameGenerator()));
+const mostCommonLetterGenerator = () => {
+  return ageGenerator().map((person) => {
+    const analyzer = {};
+    let max = 0;
+    let maxChar = "";
+    const toProcess = Object.values(person)
+      .filter((string) => typeof string === "string")
+      .join("")
+      .toLowerCase()
+      .split("")
+      .forEach((char) => {
+        if (!analyzer[char]) analyzer[char] = 1;
+        else analyzer[char]++;
+      });
+    for (let char in analyzer) {
+      if (analyzer[char] > max) {
+        max = analyzer[char];
+        maxChar = char;
+      } else if (analyzer[char] === max) {
+        if (char.charCodeAt() < maxChar.charCodeAt()) {
+          max = analyzer[char];
+          maxChar = char;
+        }
+      }
+      person.mostCommonLetter = `{ letter: '${maxChar}', count: ${max} }`;
+    }
+    return person;
+  });
+};
